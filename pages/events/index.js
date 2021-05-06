@@ -3,8 +3,13 @@ import Layout from "@/components/Layout"
 import {API_URL} from '@/config/index'
 import EventItem from '@/components/EventItem'
 import Link from "next/link"
+import Pagination from "@/components/Pagination"
 
-export default function EventsPage({events}) {
+const PER_PAGE=5
+
+export default function EventsPage({events,total,page}) {
+
+  
   return (
     <Layout>
       <h1>Events</h1>
@@ -15,17 +20,26 @@ export default function EventsPage({events}) {
           return <EventItem key={key} evt={evt}/>
         })
       }
+  <Pagination total={total} page={page} perPage={PER_PAGE}/>
     </Layout>
   )
 }
 
 
-export async function getStaticProps() {
-  const res=await fetch(`${API_URL}/events?_sort=date:ASC`)
-  const events=await res.json()
+export async function getServerSideProps({query:{page=1}}) {
+
+ //calculate start page
+ const start=+page===1?0:(+page-1)*PER_PAGE
+
+//fetch total count
+const countRes=await fetch(`${API_URL}/events/count`)
+const count=await countRes.json()
+
+ //fetch events
+  const eventRes=await fetch(`${API_URL}/events?_sort=date:ASC&_limit=${PER_PAGE}&_start=${start}`)
+  const events=await eventRes.json()
 
   return {
-    props:{events},
-    revalidate:1,
+    props:{events,page:+page,total:count}
   }
 }
