@@ -1,8 +1,8 @@
 import {useState} from 'react'
 import {ToastContainer,toast} from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 import moment from 'moment'
 import {FaImage} from 'react-icons/fa'
-import 'react-toastify/dist/ReactToastify.css'
 import {useRouter} from 'next/router'
 import Link from 'next/link';
 import Image from 'next/image'
@@ -177,6 +177,7 @@ export default function EditEventPage({evt}) {
 }
 
 export async function getServerSideProps({params:{id}}) {
+
     const res=await fetch(`${API_URL}/events/${id}`)
     const evt=await res.json()
 
